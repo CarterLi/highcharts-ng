@@ -21,8 +21,7 @@
   'use strict';
 
   angular.module('highcharts-ng', [])
-    .factory('highchartsNG', ['$q', '$window', highchartsNG])
-    .directive('highchart', ['highchartsNG', '$timeout', highchart]);
+    .directive('highchart', ['$timeout', highchart]);
 
   function prependMethod(obj, method, func) {
     var original = obj[method];
@@ -57,24 +56,7 @@
     return destination;
   }
 
-  function highchartsNG($q, $window) {
-    var highchartsProm = $q.when($window.Highcharts);
-
-    function getHighchartsOnce() {
-      return highchartsProm;
-    }
-
-    return {
-      getHighcharts: getHighchartsOnce,
-      ready: function ready(callback, thisArg) {
-        getHighchartsOnce().then(function() {
-          callback.call(thisArg);
-        });
-      }
-    };
-  }
-
-  function highchart(highchartsNGUtils, $timeout) {
+  function highchart($timeout) {
 
     // acceptable shared state
     var seriesId = 0;
@@ -453,12 +435,7 @@
     }
 
     function link(scope, element, attrs) {
-      function highchartsCb(Highcharts) {
-        linkWithHighcharts(Highcharts, scope, element, attrs);
-      }
-      highchartsNGUtils
-        .getHighcharts()
-        .then(highchartsCb);
+      linkWithHighcharts(Highcharts, scope, element, attrs);
     }
 
     return {
