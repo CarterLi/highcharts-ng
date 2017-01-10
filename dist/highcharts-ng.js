@@ -1,34 +1,28 @@
 /**
  * highcharts-ng
- * @version v0.0.13 - 2016-10-04
+ * @version v0.0.13 - 2017-01-10
  * @link https://github.com/pablojim/highcharts-ng
  * @author Barry Fitzgerald <>
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
 
-if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.exports === exports){
-  module.exports = 'highcharts-ng';
-}
-
-(function () {
+;(function (root, factory) {
   'use strict';
-  /*global angular: false, Highcharts: false */
 
+  if (typeof module !== 'undefined' && module.exports) {
+    var ng = typeof angular === 'undefined' ? require('angular') : angular;
+    var hc = typeof Highcharts === 'undefined' ? require('highcharts') : Highcharts;
+    factory(ng, hc);
+    module.exports = 'highcharts-ng';
+  } else {
+    factory(root.angular, root.Highcharts);
+  }
+}(new Function('return this')(), function (angular, Highcharts) {
+  'use strict';
 
   angular.module('highcharts-ng', [])
     .factory('highchartsNG', ['$q', '$window', highchartsNG])
     .directive('highchart', ['highchartsNG', '$timeout', highchart]);
-
-  //IE8 support
-  function indexOf(arr, find, i /*opt*/) {
-    if (i === undefined) i = 0;
-    if (i < 0) i += arr.length;
-    if (i < 0) i = 0;
-    for (var n = arr.length; i < n; i++)
-      if (i in arr && arr[i] === find)
-        return i;
-    return -1;
-  }
 
   function prependMethod(obj, method, func) {
     var original = obj[method];
@@ -254,22 +248,22 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.ex
                 if (s.visible !== undefined && chartSeries.visible !== s.visible) {
                   chartSeries.setVisible(s.visible, false);
                 }
-                
+
                 // Make sure the current series index can be accessed in seriesOld
                 if (idx < seriesOld.length) {
                   var sOld = seriesOld[idx];
                   var sCopy = angular.copy(sOld);
-                  
+
                   // Get the latest data point from the new series
                   var ptNew = s.data[s.data.length - 1];
-                  
+
                   // Check if the new and old series are identical with the latest data point added
                   // If so, call addPoint without shifting
                   sCopy.data.push(ptNew);
                   if (angular.equals(sCopy, s)) {
                     chartSeries.addPoint(ptNew, false);
                   }
-                  
+
                   // Check if the data change was a push and shift operation
                   // If so, call addPoint WITH shifting
                   else {
@@ -315,7 +309,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.ex
         //Now remove any missing series
         for(i = chart.series.length - 1; i >= 0; i--) {
           var s = chart.series[i];
-          if (s.options.id !== 'highcharts-navigator-series' && indexOf(ids, s.options.id) < 0) {
+          if (s.options.id !== 'highcharts-navigator-series' && ids.indexOf(s.options.id) < 0) {
             s.remove(false);
           }
         }
@@ -478,4 +472,4 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.ex
       link: link
     };
   }
-}());
+}));
